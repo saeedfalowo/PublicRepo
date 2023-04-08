@@ -366,3 +366,67 @@ select * from loaded.insurance_raw;
 ```
 
 ![Query CSV Data in Table](images/dbeaver_csv_connection_13.png)
+
+### 3.4 - Create View from table for analysis
+Cast columns (`expiry` and `insuredvalue`) to appropriate datatypes in a view without touching the original raw table.
+
+```
+drop view if exists loaded.insurance_vw;
+create or replace view loaded.insurance_vw as
+	select
+		policy,
+		to_date(expiry, 'DD-MON-YY') as expiry,
+		location,
+		state,
+		region,
+		replace(insuredValue, ',', '')::numeric insuredvalue,
+		construction,
+		businessType,
+		earthquake,
+		flood
+	from loaded.insurance_raw
+;
+```
+
+![View Result](images/dbeaver_view_query.png)
+
+- Which businessType appeared the most in any given month of the year. Which Year-Month? And how many times?
+  - ```
+    select left(expiry::varchar, 7) year_month, businessType, count(*)
+    from loaded.insurance_vw
+    group by 1, 2 order by 3 desc;
+    ```
+  - ![Answer](images/dbeaver_view_analysis_1.png)
+- Which businessType does not appeared at least once in any month of the year within the table.
+  - ```
+    with unq_months as (
+        select distinct left(expiry::varchar, 7) year_month
+        from loaded.insurance_vw
+    ), num_months as (
+        select count(*) from unq_months
+    ), unq_months_businessType as (
+        select distinct left(expiry::varchar, 7) year_month, businessType
+        from loaded.insurance_vw
+    )
+    select businessType, count(*) cnt from unq_months_businessType
+    group by 1
+    having count(*) < (select * from num_months)
+    order by 2 desc;
+    ```
+  - ![Answer](images/dbeaver_view_analysis_2.png)
+- Which businessType does not appeared at least once in any month of the year.
+  - ```
+    with unq_months_businessType as (
+        select distinct left(expiry::varchar, 7) year_month, businessType
+        from loaded.insurance_vw
+    )
+    select businessType, count(*) cnt from unq_months_businessType
+    group by 1
+    having count(*) < 12
+    order by 2 desc;
+    ```
+  - ![Answer](images/dbeaver_view_analysis_3.png)
+
+
+## 4 - REF
+[1] - https://www.postgresql.org/docs/8.1/functions-formatting.html
