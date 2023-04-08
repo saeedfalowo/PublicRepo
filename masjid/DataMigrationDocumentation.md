@@ -8,7 +8,7 @@ This documentation will provide information on how to convert data files like th
 
 To something that looks like this:
 ```
-select * from sample_insurance_tbl
+select * from loaded.insurance_raw
 ```
 
 ![Raw SQL Table](images/raw_dbeaver_table_screenshot.png)
@@ -16,19 +16,19 @@ select * from sample_insurance_tbl
 
 And operations like these could be performed for further data analysis:
 ```
-select location, count(*) as cnt from sample_insurance_tbl group by location order by cnt desc;
+select location, count(*) as cnt from loaded.insurance_raw group by location order by cnt desc;
 ```
 
 ![Location count](images/sql_location_count.png)
 
 ```
-select region, count(*) cnt from sample_insurance_tbl group by region order by cnt asc;
+select region, count(*) cnt from loaded.insurance_raw group by region order by cnt asc;
 ```
 
 ![Region count](images/sql_region_count.png)
 
 ```
-select businesstype, count(*) cnt from sample_insurance_tbl group by 1 order by 2 desc;
+select businesstype, count(*) cnt from loaded.insurance_raw group by 1 order by 2 desc;
 ```
 
 ![BusinessType count](images/sql_businesstype_count.png)
@@ -133,3 +133,236 @@ Double click on the Icon to Launch `DBeaver` SQL client application.
 ![DBeaver Desktop Icon](images/dbeaver_application.png)
 
 ## 3 - Setup Remote PostgreSQL Database
+Structured Query Language (SQL) storing and processing structured tabular data in a relational database. A relational database stores information in tabular form, with rows and columns representing different data attributes and the various relationships between the data values.
+
+PostgreSQl is one of the most widely used SQL flavours. This migration task will be making use of PostgreSQL.
+
+There are a few remote PostgreSQl clusters providers that provides various levels for free-tier compute plans.
+
+[ElephantSQL](https://www.elephantsql.com/plans.html) have about 20MB free-tier memory limit.
+
+However, the provider that will be used for this migration is the [Neon](https://neon.tech/pricing) compute provider with their 3GB* free-tier memory limit.
+
+`*` 3GB per branch and Neon allows for 10 branches in its free-tier plan.
+
+### 3.1 - Registering and Setting up PostgreSQL cluster on Neon
+Navigate to the [Neon](https://neon.tech) website, https://neon.tech, from your browser.
+
+![Neon Home Page](images/neon_home.png)
+
+Click the `Sign up` button if you dont have an account already, or click `Sign In` if you do.
+
+![Neon Sign Up Page](images/neon_signup_page.png)
+
+On the `Sign Up` page, click `Continue with Google` if you have a google account or click `Continue with Github` if you have a Github account.
+
+Upon clicking the `Continue with Google` button, you should see a page where you will need to sign into your google email account, if none of your google accounts is currently signed into on your browser, like this:
+
+![Google Account Sign In](images/neon_signup_with_google_account_sign_in.png)
+
+Or you will get a page with all your current active google accounts to choose from, like this:
+
+![Active Google Account Options](images/neon_signup_with_google_accounts_options.png)
+
+After registration, you should now see the projects page...
+
+![Neon Projects Page](images/neon_projects_page.png)
+
+Click `Create a project` and enter the desired project name, and change Region to Europe if you reside in Europe, or other region that is closest to you. Leave other options as default then click `Create project`.
+
+![Neon Create Project Prompt](images/neon_create_project_prompt.png)
+
+A prompt for the newly created project connection details will pop up.
+
+![Neon Project Connection Details](images/neon_project_connection_details_prompt.png)
+
+Highlights
+- Yellow: **Username**
+- Teal (Blue): **Password**
+- Orange: **Host**
+- Purple: **Database**
+
+Close the prompt and you will be taken to the Dashboard page...
+
+![Neon Dashboard Page](images/neon_dashboard_page.png)
+
+Click the `Skip` button to close the `Neon onboarding` info banner.
+
+![Neon Dashboard Page](images/neon_dashboard_2_page.png)
+
+You can also see the postgresql connection details examples by clicking the underlined `connection examples` link (not actual connection details for the project, just an example).
+
+You can also create a new database from the `Connection Details` box...
+
+![Neon Connection Details Box](images/neon_connection_details.png)
+
+![Neon Create Database Prompt](images/neon_create_database_prompt.png)
+
+![Neon Connection Details Box](images/neon_connection_details_2.png)
+
+You can then copy the connection string for either of the databases by first unmasking the password portion of the string or just directly using the copy button on the right of the string box to copy the connection string.
+
+![Neon Connection Details Box](images/neon_connection_details_3.png)
+
+![Neon Connection Details Box](images/neon_connection_details_4.png)
+
+- **neondb** connection string: `postgres://tyslogo:Go6cKQkmbOl8@ep-curly-limit-741542.eu-central-1.aws.neon.tech/neondb`
+  - Username: `tyslogo`
+  - Password: `Go6cKQkmbOl8`
+  - Host: `ep-curly-limit-741542.eu-central-1.aws.neon.tech`
+  - Database: `neondb`
+- **main_db** connection string: `postgres://tyslogo:Go6cKQkmbOl8@ep-curly-limit-741542.eu-central-1.aws.neon.tech/main_db`
+  - Username: `tyslogo`
+  - Password: `Go6cKQkmbOl8`
+  - Host: `ep-curly-limit-741542.eu-central-1.aws.neon.tech`
+  - Database: `main_db`
+
+
+### 3.2 - Connecting DBeaver to Neon PostgreSQL Cluster
+Open up the DBeaver application...
+
+![DBeaver Application](images/dbeaver_application_2.png)
+
+Click on the `New Database Connection` Icon on the top left corner of the DBeaver window.
+
+Choose the `PostgreSQL` option on the `All` tab and click `Next`.
+
+![Select your database](images/dbeaver_connect_to_database_1.png)
+
+Configure the postgreSQL database with the connection string given on the Neon Dashboard and partitioned into different fields as done in the previous section:
+
+- **neondb** connection string: `postgres://tyslogo:Go6cKQkmbOl8@ep-curly-limit-741542.eu-central-1.aws.neon.tech/neondb`
+  - Username: `tyslogo`
+  - Password: `Go6cKQkmbOl8`
+  - Host: `ep-curly-limit-741542.eu-central-1.aws.neon.tech`
+  - Database: `neondb`
+
+And leave the Port number as the default: 5432.
+
+![Configure PostgreSQL Database](images/dbeaver_connect_to_database_2.png)
+
+Test the connection with the `Test Connection ...` button.
+
+![Test PostgreSQL Database Connection](images/dbeaver_connect_to_database_3.png)
+
+Click the `OK` button and then the `Finish` button if the Connection Test proves successful.
+
+![Connect to PostgreSQL Database](images/dbeaver_connect_to_database_4.png)
+
+Click the `Database Navigator` button on the top left on the DBeaver application. Select the desired database from the list and click the `Connect` plug icon &#128268; to connect to the database.
+
+![View New PostgreSQL Database](images/dbeaver_connect_to_database_5.png)
+
+Upon successful connection, the connected database will gain a green tick.
+
+![View New PostgreSQL Database](images/dbeaver_connect_to_database_6.png)
+
+Click the `Open SQL script` option in the SQL button dropdown to open a new SQL script.
+
+### 3.3 - Migrate CSV file data into SQL table
+There are multiple ways to partition SQL data to keep data separate. Three of these are using Databases (as we have two databases `neondb` and `main_db`), Schemas, and Tables.
+
+![Database Tree](images/dbeaver_queries_1.png)
+
+Only the default `public` schema can be seen in the Database tree. Let's create a `loaded` schema to hold our raw tables.
+
+Write the sql statement below and click the &#9654;, play, button to execute the query.
+```
+create schema loaded;
+```
+
+![Create Schema](images/dbeaver_queries_0.png)
+
+This query will create a new schema called `loaded`. However, to see the new schema in the database tree, the tree needs to be refreshed first. Right click on the `neondb` connection and click `Refresh` in the dropdown.
+
+![Refresh Connection](images/dbeaver_queries_2.png)
+
+![View Schema](images/dbeaver_queries_3.png)
+
+Now we need to create a table for our CSV files data within the `loaded` schema.
+
+Open the previously exported CSV file with Notepad as formally described.
+
+![CSV file header](images/csv_file_header.png)
+
+Copy the header (column name line) of the csv file and construct the `Create Table` statement like so:
+
+```
+create table loaded.insurance_raw (
+	policy			text,
+	expiry			text,
+	location		text,
+	state			text,
+	region			text,
+	insuredValue 	text,
+	construction 	text,
+	businessType 	text,
+	earthquake 		text,
+	flood 			text
+);
+```
+
+Use the `Tab` keyboard key to align the column names and their datatypes (not required, a single white space between the column names and their datatypes will do).
+
+![Create Table Statement](images/dbeaver_create_table.png)
+
+Place the cursor at the last line of the query after the semicolon, `;`, make sure all the underlined spots have the target database named there, and then press the &#9654;, play, button to execute the `Create table` statement.
+
+Refresh the connection to see the newly created table under the database tree.
+![Create Table Statement](images/dbeaver_create_table_2.png)
+
+Query the new table to see the contents of the table.
+
+```
+select * from loaded.insurance_raw;
+```
+
+![Create Table Statement](images/dbeaver_create_table_3.png)
+
+Should show an empty table.
+
+Now we need to insert the csv data file contents into the new table.
+
+Click on the &#128268;+ icon to create a new connection.
+
+![DBeaver Application](images/dbeaver_application_2.png)
+
+Search for within the `All` tab, select the `CSV` connection and click `Next >`
+
+![Create CSV Connection](images/dbeaver_csv_connection_1.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_2.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_3.png)
+
+Choose your desired folder to use as your csv database. The example uses exported csv file folder as the csv database folder.
+
+![Create CSV Connection](images/dbeaver_csv_connection_4.png)
+
+After clicking the `Finish` button, navigate to the database tree and right-click on the desired empty table and click `Import Data` to import the csv file data into the table.
+
+![Create CSV Connection](images/dbeaver_csv_connection_5.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_6.png)
+
+Select the export csv file.
+
+![Create CSV Connection](images/dbeaver_csv_connection_7.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_8.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_9.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_10.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_11.png)
+
+![Create CSV Connection](images/dbeaver_csv_connection_12.png)
+
+Upon loading the csv file contents into the table, query the table again to confirm that data has been imported successfully.
+
+```
+select * from loaded.insurance_raw;
+```
+
+![Query CSV Data in Table](images/dbeaver_csv_connection_13.png)
