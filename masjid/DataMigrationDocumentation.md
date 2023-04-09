@@ -35,6 +35,21 @@ select businesstype, count(*) cnt from loaded.insurance_raw group by 1 order by 
 
 And many more operations can be done on the data to reveal new insights hiding therein.
 
+# Table of Contents
+- [1 - Preparing the data files for ingestion](#1---preparing-the-data-files-for-ingestion)
+- [2 - Installing SQL Client Application](#2---installing-sql-client-application)
+- [3 - Setup Remote PostgreSQL Database](#3---setup-remote-postgresql-database)
+  - [3.1 - Registering and Setting up PostgreSQL cluster on Neon](#31---registering-and-setting-up-postgresql-cluster-on-neon)
+  - [3.2 - Connecting DBeaver to Neon PostgreSQL Cluster](#32---connecting-dbeaver-to-neon-postgresql-cluster)
+- [4 - Migrate CSV file data into SQL table](#4---migrate-csv-file-data-into-sql-table)
+- [5 - Create View from table for analysis](#5---create-view-from-table-for-analysis)
+- [6 - Data Manipulation](#6---data-manipulation)
+  - [6.1 - Insert into and Delete from raw table](#61---insert-into-and-delete-from-raw-table)
+  - [6.2 - Update raw table](#62---update-raw-table)
+- [7 - Export Tables, Views, or Query Results as CSV Files](#7---export-tables-views-or-query-results-as-csv-files)
+- [8 - Joins](#8---joins)
+- [9 - REF](#9---ref)
+
 ## 1 - Preparing the data files for ingestion
 Excel files with .xls or xlsx file extensions are not friendly enough for raw data extraction due to their nested nature (as in having multiple pages within). Therefore the data within each of those pages in the excel file needs to be extracted into csv files.
 
@@ -259,7 +274,7 @@ Upon successful connection, the connected database will gain a green tick.
 
 Click the `Open SQL script` option in the SQL button dropdown to open a new SQL script.
 
-### 3.3 - Migrate CSV file data into SQL table
+## 4 - Migrate CSV file data into SQL table
 There are multiple ways to partition SQL data to keep data separate. Three of these are using Databases (as we have two databases `neondb` and `main_db`), Schemas, and Tables.
 
 ![Database Tree](images/dbeaver_queries_1.png)
@@ -367,7 +382,7 @@ select * from loaded.insurance_raw;
 
 ![Query CSV Data in Table](images/dbeaver_csv_connection_13.png)
 
-### 3.4 - Create View from table for analysis
+## 5 - Create View from table for analysis
 Cast columns (`expiry` and `insuredvalue`) to appropriate datatypes in a view without touching the original raw table.
 
 ```
@@ -427,9 +442,10 @@ create or replace view loaded.insurance_vw as
     ```
   - ![Answer](images/dbeaver_view_analysis_3.png)
 
-### 3.5 - Insert, Update, Delete from raw table
+## 6 - Data Manipulation
 New rows can be added, existing rows can be altered/updated, and deleted in the table (not view).
 
+### 6.1 - Insert into and Delete from raw table
 All or specific columns can be inserted during the insert operation.
 
 Before insert:
@@ -491,6 +507,8 @@ where policy = '000000';
 
 ![Query for 000000 Policy](images/dbeaver_insert_delete_6.png)
 
+### 6.2 - Update raw table
+
 Update raw table:
 
 Out of all two rows with the same policy id, update just one using multiple filters.
@@ -517,7 +535,7 @@ where policy = '000000';
 
 ![Update rows with single filter](images/dbeaver_insert_delete_10.png)
 
-### 3.6 - Export Tables, Views, or Query Results as CSV Files
+## 7 - Export Tables, Views, or Query Results as CSV Files
 
 ![Export Table as CSV](images/dbeaver_export_as_csv_1.png)
 
@@ -561,11 +579,11 @@ The rest of the steps are identical to what were mentioned in the previous steps
 
 ![Export Query Results as CSV](images/dbeaver_export_as_csv_17.png)
 
-### 3.7 - Joins
+## 8 - Joins
 Joins in SQL is a way to merge multiple tables together to extend the range of information. There are a multitude of ways to merge tables and views together, here is a youtube video showcasing some of the major join methods.
 
 [SQL Joins Explained |¦| Joins in SQL |¦| SQL Tutorial](https://www.youtube.com/watch?v=9yeOJ0ZMUYw)
 
 
-## 4 - REF
+## 9 - REF
 [1] - https://www.postgresql.org/docs/8.1/functions-formatting.html
