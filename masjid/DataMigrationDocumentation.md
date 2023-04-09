@@ -427,6 +427,145 @@ create or replace view loaded.insurance_vw as
     ```
   - ![Answer](images/dbeaver_view_analysis_3.png)
 
+### 3.5 - Insert, Update, Delete from raw table
+New rows can be added, existing rows can be altered/updated, and deleted in the table (not view).
+
+All or specific columns can be inserted during the insert operation.
+
+Before insert:
+
+```
+select * from loaded.insurance_vw
+where policy = '000000';
+```
+
+![Query for 000000 Policy](images/dbeaver_insert_delete_1.png)
+
+```
+insert into loaded.insurance_raw (policy, insuredValue)
+values ('000000', '123');
+```
+
+![Insert 1 row](images/dbeaver_insert_delete_2.png)
+
+After insert:
+
+```
+select * from loaded.insurance_vw
+where policy = '000000';
+```
+
+![Query for 000000 Policy](images/dbeaver_insert_delete_3.png)
+
+Delete from raw table:
+
+```
+delete from loaded.insurance_raw
+where policy = '000000';
+```
+
+![Delete 000000 Policy](images/dbeaver_insert_delete_4.png)
+
+```
+select * from loaded.insurance_vw
+where policy = '000000';
+```
+
+![Query for 000000 Policy](images/dbeaver_insert_delete_1.png)
+
+Insert multiple rows:
+
+```
+insert into loaded.insurance_raw (policy, insuredValue)
+values ('000000', '123'),
+		('000000', '456');
+```
+![Insert 2 rows](images/dbeaver_insert_delete_5.png)
+
+After insert:
+
+```
+select * from loaded.insurance_vw
+where policy = '000000';
+```
+
+![Query for 000000 Policy](images/dbeaver_insert_delete_6.png)
+
+Update raw table:
+
+Out of all two rows with the same policy id, update just one using multiple filters.
+
+```
+update loaded.insurance_raw
+set location = 'London'
+where policy = '000000' and insuredValue = '456;
+```
+
+![Update rows with multiple filters](images/dbeaver_insert_delete_7.png)
+
+![Update rows with multiple filters](images/dbeaver_insert_delete_8.png)
+
+Update all rows with a single policy id:
+
+```
+update loaded.insurance_raw
+set businesstype = 'Religious Services'
+where policy = '000000';
+```
+
+![Update rows with single filter](images/dbeaver_insert_delete_9.png)
+
+![Update rows with single filter](images/dbeaver_insert_delete_10.png)
+
+### 3.6 - Export Tables, Views, or Query Results as CSV Files
+
+![Export Table as CSV](images/dbeaver_export_as_csv_1.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_2.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_3.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_4.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_5.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_6.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_7.png)
+
+![Export Table as CSV](images/dbeaver_export_as_csv_8.png)
+
+The same process can be followed to export Views into csv files.
+
+![Export View as CSV](images/dbeaver_export_as_csv_9.png)
+
+![Export View as CSV](images/dbeaver_export_as_csv_10.png)
+
+![Export View as CSV](images/dbeaver_export_as_csv_11.png)
+
+Exporting Query results also follows the same process with some differences...
+
+Starts from clicking the `Export data` drop down while in the query result tab to be exported.
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_12.png)
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_13.png)
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_14.png)
+
+The rest of the steps are identical to what were mentioned in the previous steps for exporting tables and views into csv files.
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_15.png)
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_16.png)
+
+![Export Query Results as CSV](images/dbeaver_export_as_csv_17.png)
+
+### 3.7 - Joins
+Joins in SQL is a way to merge multiple tables together to extend the range of information. There are a multitude of ways to merge tables and views together, here is a youtube video showcasing some of the major join methods.
+
+[SQL Joins Explained |¦| Joins in SQL |¦| SQL Tutorial](https://www.youtube.com/watch?v=9yeOJ0ZMUYw)
+
 
 ## 4 - REF
 [1] - https://www.postgresql.org/docs/8.1/functions-formatting.html
